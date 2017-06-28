@@ -7,7 +7,8 @@ var spawn = require("child_process").spawn,
 	through = require("through"),
 	concat = require("concat-stream");
 
-module.exports.read = function(src, options, callback) {
+module.exports.read = function(src, options) {
+	return new Promise(function(resolve,reject) {
 	if (typeof options === "function") {
 		callback = options;
 		options = {};
@@ -42,15 +43,14 @@ module.exports.read = function(src, options, callback) {
 		}
 	});
 
-	if (callback) {
-		stream.on("metadata", callback.bind(null, null));
-		stream.on("error", callback);
-	}
+	stream.on("metadata", resolve.bind(this));
+	stream.on("error", reject.bind(this));
 
-	return stream;
-};
+	// return stream;
+})};
 
-module.exports.write = function(src, data, options, callback) {
+module.exports.write = function(src, data, options) {
+	return new Promise(function(resolve,reject) {
 	if (typeof options === "function") {
 		callback = options;
 		options = {};
@@ -109,7 +109,7 @@ module.exports.write = function(src, data, options, callback) {
 	}
 
 	return stream;
-};
+})};
 
 var path = require("path");
 function getTempPath(src) {
